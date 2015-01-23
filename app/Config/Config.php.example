@@ -1,0 +1,28 @@
+<?php
+
+return [
+    "application" => [
+        "base_url" => "http://localhost",
+        "dev" => true
+    ],
+    "database" => [
+        "driver" => "pdo_mysql",
+        "user"  => "root",
+        "password" => "",
+        "dbname" => ""
+    ],
+    "logger" => [
+        "date_format" => "Y n j, g:i a",
+        "format" => "%datetime% > %level_name% > %message% %context% %extra%\n",
+        "log_level" => \Monolog\Logger::DEBUG,
+        "handlers" => [
+                [
+                    "name" => "StreamHandler",
+                    "rotate" => true,
+                ],
+                [
+                    "name" => "BrowserConsoleHandler"
+                ]
+            ]
+    ]
+];
