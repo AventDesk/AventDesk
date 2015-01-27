@@ -17,7 +17,7 @@ trait EventEmitterAwareTrait
     protected $emitter;
 
     /**
-     * @param EmitterInterface $emitter
+     * {@inheritdoc}
      */
     public function setEventEmitter(EmitterInterface $emitter)
     {
@@ -25,7 +25,7 @@ trait EventEmitterAwareTrait
     }
 
     /**
-     * @return EmitterInterface
+     * {@inheritdoc}
      */
     public function getEventEmitter()
     {
