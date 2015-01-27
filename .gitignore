@@ -5,3 +5,4 @@ composer.lock
 puphpet/files/dot/ssh/*
 app/Config/Config.php
 !app/Writeable/Logs/.gitkeep
+tests/_output/*

@@ -18,6 +18,10 @@
     "firebase/php-jwt": "~1.0",
     "monolog/monolog": "~1.12"
   },
+  "require-dev": {
+    "codeception/codeception": "*",
+    "phpspec/prophecy": "*"
+  },
   "autoload" : {
     "psr-4": {
       "Avent\\": "app/"
