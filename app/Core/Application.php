@@ -18,6 +18,7 @@ use League\Route\RouteCollection;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\Validation;
 
 class Application implements
     EventEmitterAwareInterface,
@@ -149,6 +150,12 @@ class Application implements
             $request = Request::createFromGlobals();
             $request->overrideGlobals();
             return $request;
+        });
+
+        $this->getContainer()->singleton("Validator", function () {
+            return Validation::createValidatorBuilder()
+                ->enableAnnotationMapping()
+                ->getValidator();
         });
 
         $this->getContainer()->singleton("EventEmitter", $this->getEventEmitter());
