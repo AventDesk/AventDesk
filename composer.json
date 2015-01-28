@@ -13,10 +13,12 @@
     "doctrine/orm": "~2.4",
     "league/container": "~1.2",
     "league/route": "~1.0",
-    "league/fractal": "0.11.*",
     "league/event": "~2.0",
     "firebase/php-jwt": "~1.0",
-    "monolog/monolog": "~1.12"
+    "monolog/monolog": "~1.12",
+    "ircmaxell/password-compat": "dev-master",
+    "ellipsesynergie/api-response": "dev-master",
+    "symfony/validator": "~2.6"
   },
   "require-dev": {
     "codeception/codeception": "*",
