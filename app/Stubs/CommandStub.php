@@ -4,6 +4,7 @@
 namespace Avent\Stubs;
 
 use Avent\Core\CommandBus\CommandInterface;
+use Avent\Core\Repository\RepositoryAwareTrait;
 
 /**
  * Class CommandStub
@@ -11,7 +12,7 @@ use Avent\Core\CommandBus\CommandInterface;
  */
 class CommandStub implements CommandInterface
 {
-
+    use RepositoryAwareTrait;
 }
 
 // EOF
