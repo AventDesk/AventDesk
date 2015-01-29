@@ -6,6 +6,8 @@ namespace Avent\Core\Event\Abstraction;
 use Avent\Core\Event\EventEmitter;
 use Avent\Core\Event\EventListenerInterface;
 use Avent\Core\Event\IsListenerTrait;
+use Avent\Core\Logger\LoggerAwareInterface;
+use Avent\Core\Logger\LoggerAwareTrait;
 use FastRoute\Dispatcher;
 use League\Event\EventInterface;
 use Monolog\Logger;
@@ -14,14 +16,10 @@ use Monolog\Logger;
  * Class BeforeDispatchAbstract
  * @package Avent\Core\Event\Abstraction
  */
-abstract class BeforeDispatchAbstract implements EventListenerInterface
+abstract class BeforeDispatchAbstract implements EventListenerInterface, LoggerAwareInterface
 {
     use IsListenerTrait;
-
-    /**
-     * @var Logger
-     */
-    protected $logger;
+    use LoggerAwareTrait;
 
     /**
      * @param EventInterface $event
