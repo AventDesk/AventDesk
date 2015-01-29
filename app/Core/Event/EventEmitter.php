@@ -16,6 +16,9 @@ class EventEmitter extends Emitter implements ContainerAwareInterface
     const AFTER_APP = "after.app";
     const BEFORE_DISPATCH = "before.dispatch";
     const AFTER_DISPATCH = "after.dispatch";
+    const ON_ERROR = "on.error";
+    const BEFORE_USER_REGISTRATION = "before.user.Registration";
+    const AFTER_USER_REGISTRATION = "after.user.registration";
 
     public function addListener($event, $listener, $priority = self::P_NORMAL)
     {
