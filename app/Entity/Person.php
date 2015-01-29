@@ -3,15 +3,18 @@
 
 namespace Avent\Entity;
 
+use Avent\Core\Entity\EntityInterface;
 use Avent\Core\Entity\ToArrayTrait;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @Entity(repositoryClass="Avent\Repository\PersonRepository")
  * @Table(name="person")
  **/
-class Person
+class Person implements EntityInterface
 {
     use ToArrayTrait;
+
     /**
      * @Id @Column(type="integer") @GeneratedValue
      * @var int
@@ -29,6 +32,33 @@ class Person
      * @var string
      */
     protected $password;
+
+    /**
+     * @OneToMany(targetEntity="Article", mappedBy="person")
+     * @var \Doctrine\Common\Collections\ArrayCollection
+     **/
+    protected $article = null;
+
+    public function __construct()
+    {
+        $this->article = new ArrayCollection();
+    }
+
+    /**
+     * @param Article $article
+     */
+    public function addArticle(Article $article)
+    {
+        $this->article[] = $article;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getArticles()
+    {
+        return $this->article;
+    }
 
     /**
      * @return int
