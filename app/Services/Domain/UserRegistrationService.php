@@ -35,7 +35,13 @@ class UserRegistrationService
 
     public function register(UserRegistrationCommand $command)
     {
+        $this->event_emitter->emit("before.user.registration", $command);
+
         $response = ApiResponse::create();
+
+        if ($command->getPassword() == null) {
+                $command->setPassword((string) rand(1000, 9999));
+        }
 
         try {
             $violation = $this->validator->validate($command);
@@ -54,6 +60,8 @@ class UserRegistrationService
             $person->setPassword($this->hasher->hash($command->getPassword()));
 
             $this->repository->save($person);
+
+            $this->event_emitter->emit("after.user.registration", $command);
 
             return $response->withArray([
                 "message" => "User created successfully",
