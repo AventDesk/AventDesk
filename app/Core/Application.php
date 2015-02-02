@@ -45,8 +45,8 @@ class Application implements
         } else {
             $this->routes[] = [$method, $uri, $callback];
             list($class_name) = explode("::", $callback);
-            $this->getContainer()->add($class_name)
-                ->withArguments(["EntityManager", "EventEmitter"]);
+            $this->getContainer()->singleton($class_name)
+                ->withArguments(["EventEmitter", "CommandBus"]);
         }
     }
 
@@ -86,6 +86,13 @@ class Application implements
     public function registerService($alias, $callback)
     {
         $this->getContainer()->add($alias, $callback);
+    }
+
+    public function registerCommandHandler($handler)
+    {
+        $this->container->singleton($handler)
+            ->withArgument("DomainServicesFactory")
+            ->withArgument("InfrastructureServicesFactory");
     }
 
     public function run()

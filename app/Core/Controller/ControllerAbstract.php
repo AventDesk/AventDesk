@@ -3,22 +3,30 @@
 
 namespace Avent\Core\Controller;
 
-use Avent\Core\EntityManager\EntityManagerAwareInterface;
-use Avent\Core\EntityManager\EntityManagerAwareTrait;
+use Avent\Core\CommandBus\CommandBus;
+use Avent\Core\CommandBus\CommandBusAwareInterface;
+use Avent\Core\CommandBus\CommandBusAwareTrait;
 use Avent\Core\Event\EventEmitterAwareInterface;
 use Avent\Core\Event\EventEmitterAwareTrait;
-use Doctrine\ORM\EntityManagerInterface;
 use League\Event\EmitterInterface;
 
-abstract class ControllerAbstract implements EntityManagerAwareInterface, EventEmitterAwareInterface
+/**
+ * Class ControllerAbstract
+ * @package Avent\Core\Controller
+ */
+abstract class ControllerAbstract implements EventEmitterAwareInterface, CommandBusAwareInterface
 {
-    use EntityManagerAwareTrait;
+    use CommandBusAwareTrait;
     use EventEmitterAwareTrait;
 
-    public function __construct(EntityManagerInterface $em, EmitterInterface $event)
+    /**
+     * @param EmitterInterface $event
+     * @param CommandBus $command_bus
+     */
+    public function __construct(EmitterInterface $event, CommandBus $command_bus)
     {
         $this->setEventEmitter($event);
-        $this->setEntityManager($em);
+        $this->setCommandBus($command_bus);
     }
 }
 

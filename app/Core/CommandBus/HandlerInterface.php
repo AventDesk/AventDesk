@@ -3,11 +3,13 @@
 
 namespace Avent\Core\CommandBus;
 
+use Avent\Core\Services\ServicesFactoryAwareInterface;
+
 /**
  * Interface HandlerInterface
  * @package Avent\Core\CommandBus
  */
-interface HandlerInterface
+interface HandlerInterface extends ServicesFactoryAwareInterface
 {
     /**
      * Handle a CommandInterface object

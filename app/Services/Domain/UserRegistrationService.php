@@ -11,16 +11,38 @@ use League\Event\EmitterInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Class UserRegistrationService
+ * @package Avent\Services\Domain
+ */
 class UserRegistrationService
 {
+    /**
+     * @var PersonRepository
+     */
     private $repository;
 
+    /**
+     * @var ValidatorInterface
+     */
     private $validator;
 
+    /**
+     * @var HasherService
+     */
     private $hasher;
 
+    /**
+     * @var EmitterInterface
+     */
     private $event_emitter;
 
+    /**
+     * @param PersonRepository $repository
+     * @param EmitterInterface $event_emitter
+     * @param ValidatorInterface $validator
+     * @param HasherService $hasher
+     */
     public function __construct(
         PersonRepository $repository,
         EmitterInterface $event_emitter,
@@ -33,9 +55,15 @@ class UserRegistrationService
         $this->event_emitter = $event_emitter;
     }
 
+    /**
+     * @param UserRegistrationCommand $command
+     * @return Response
+     */
     public function register(UserRegistrationCommand $command)
     {
         $this->event_emitter->emit("before.user.registration", $command);
+
+        $command->setRepository($this->repository);
 
         $response = ApiResponse::create();
 

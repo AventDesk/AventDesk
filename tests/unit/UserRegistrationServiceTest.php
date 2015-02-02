@@ -2,48 +2,67 @@
 
 class UserRegistrationServiceTest extends \PHPUnit_Framework_TestCase
 {
-    protected $em;
-
-    protected $event_emitter;
-
-    protected $validator;
-
-    protected $hasher;
+    private $app;
 
     protected function setUp()
     {
-        $this->em = \Codeception\Util\Stub::make("\\Doctrine\\ORM\\EntityManager",
-            [
-                "getRepository" => \Codeception\Util\Stub::make("\\Avent\\Repository\\PersonRepository",
-                    [
-                        "save" => function () {
-                            return true;
-                        },
-                        "findOneBy" => function () {
-                            return new \Avent\Entity\Person();
-                        }
-                    ]
-                ),
-            ]
-        );
+        // Define Depencencies
+        $repository_mock = \Codeception\Util\Stub::make("\\Avent\\Repository\\PersonRepository", [
+            "save" => function () {
+                return true;
+            },
+            "findOneBy" => function () {
+                return true;
+            }
+        ]);
 
-        $this->event_emitter = \Codeception\Util\Stub::make("\\Avent\\Core\\Event\\EventEmitter", [
-                "emit" => function () {
-                    return true;
-                }
-            ]
-        );
+        $em_mock = \Codeception\Util\Stub::make("\\Doctrine\\ORM\\EntityManager", [
+            "getRepository" => $repository_mock
+        ]);
 
-        $this->validator = \Symfony\Component\Validator\Validation::createValidatorBuilder()
-            ->enableAnnotationMapping()
-            ->getValidator();
+        $event_mock = \Codeception\Util\Stub::make("\\Avent\\Core\\Event\\EventEmitter", [
+            "emit" => function () {
+                return true;
+            }
+        ]);
 
-        $this->hasher = new \Avent\Services\Domain\HasherService();
+        $hasher_mock = \Codeception\Util\Stub::make("\\Avent\\Services\\Domain\\HasherService", [
+            "hash" => function () {
+                return "12345";
+            }
+        ]);
+
+        $app = new \Avent\Core\Application();
+        $app->getContainer()->singleton("PersonRepository", $repository_mock);
+        $app->getContainer()->singleton("EventEmitter", $event_mock);
+        $app->getContainer()->singleton("EntityManager", $em_mock);
+        $app->getContainer()->singleton("HasherService", $hasher_mock);
 
         \Doctrine\Common\Annotations\AnnotationRegistry::registerAutoloadNamespace(
             "Symfony\\Component\\Validator\\Constraint",
             __DIR__ . "/../../vendor/symfony/validator"
         );
+
+        // services
+        $app->getContainer()->singleton("Avent\\Services\\Domain\\UserRegistrationService")
+            ->withArgument("PersonRepository")
+            ->withArgument("EventEmitter")
+            ->withArgument("Validator")
+            ->withArgument("HasherService");
+
+        // Services factory
+        $app->getContainer()->singleton("DomainServicesFactory", function() use ($app) {
+            return new \Avent\Services\DomainServiceFactory($app->getContainer());
+        });
+
+        $app->getContainer()->singleton("InfrastructureServicesFactory", function () use ($app) {
+            return new \Avent\Services\InfrastructureServiceFactory($app->getContainer());
+        });
+
+        // Define Handler
+        $app->registerCommandHandler("Avent\\CommandBus\\Handler\\UserRegistrationHandler");
+
+        $this->app = $app;
     }
 
     protected function tearDown()
@@ -53,22 +72,16 @@ class UserRegistrationServiceTest extends \PHPUnit_Framework_TestCase
     // tests
     public function testUserRegistrationService()
     {
-        $repository = $this->em->getRepository("\\Avent\\Repository\\PersonRepository");
+        $handler = $this->app->getContainer()->get("Avent\\CommandBus\\Handler\\UserRegistrationHandler");
 
         $command = new \Avent\CommandBus\Command\UserRegistrationCommand();
-        $command->setRepository($repository);
 
-        $user_registration = new \Avent\Services\Domain\UserRegistrationService(
-            $repository,
-            $this->event_emitter,
-            $this->validator,
-            $this->hasher
-        );
+        $command->setEmail("john@doe.com");
 
-        $command->setEmail("me@info.net");
-        $command->setPassword("1234");
-        $response = $user_registration->register($command);
+        $response = $handler->handle($command);
 
-        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_OK, $response->getStatusCode());
+        $array_response = json_decode($response->getContent());
+
+        $this->assertSame("john@doe.com", $array_response->data->email);
     }
 }

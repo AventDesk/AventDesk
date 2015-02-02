@@ -5,10 +5,13 @@ namespace Avent\CommandBus\Command;
 
 use Avent\Core\CommandBus\CommandInterface;
 use Avent\Core\Repository\RepositoryAwareTrait;
-
 use Avent\Entity\Person;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Class UserRegistrationCommand
+ * @package Avent\CommandBus\Command
+ */
 class UserRegistrationCommand implements CommandInterface
 {
     use RepositoryAwareTrait;
@@ -65,7 +68,7 @@ class UserRegistrationCommand implements CommandInterface
     {
         $person = $this->repository->findOneBy(["email" => $this->getEmail()]);
 
-        return ($person instanceof Person) ? true : false;
+        return ($person instanceof Person) ? false : true;
     }
 }
 

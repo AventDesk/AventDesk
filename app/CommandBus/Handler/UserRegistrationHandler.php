@@ -6,31 +6,23 @@ namespace Avent\CommandBus\Handler;
 
 use Avent\Core\CommandBus\CommandInterface;
 use Avent\Core\CommandBus\HandlerInterface;
-use Avent\Services\Domain\HasherService;
-use Avent\Services\Domain\UserRegistrationService;
-use League\Container\ContainerAwareInterface;
-use League\Container\ContainerAwareTrait;
-use League\Container\ContainerInterface;
+use Avent\Core\Services\ServicesFactoryAwareTrait;
+use Avent\Services\DomainServiceFactory;
+use Avent\Services\InfrastructureServiceFactory;
 
-class UserRegistrationHandler implements HandlerInterface, ContainerAwareInterface
+class UserRegistrationHandler implements HandlerInterface
 {
-    use ContainerAwareTrait;
+    use ServicesFactoryAwareTrait;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(DomainServiceFactory $domain_services, InfrastructureServiceFactory $infra_services)
     {
-        $this->container = $container;
+        $this->setDomainServicesFactory($domain_services);
+        $this->setInfrastructureServicesFactory($infra_services);
     }
 
     public function handle(CommandInterface $command)
     {
-        $repository = $this->container->get("EntityManager")->getRepository("Avent\\Repository\\PersonRepository");
-        $validator = $this->container->get("Validator");
-        $event_emitter = $this->container->get("EventEmitter");
-        $command->setRepository($repository);
-        $hash_service = new HasherService();
-
-        $registration_service = new UserRegistrationService($repository, $event_emitter, $validator, $hash_service);
-
+        $registration_service = $this->getDomainServicesFactory()->createUserRegistrationService();
         return $registration_service->register($command);
     }
 }
