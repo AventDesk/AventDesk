@@ -1,7 +1,7 @@
 {
   "name": "avent/helpdesk",
   "description": "Free Opensource Helpdesk",
-  "minimum-stability": "stable",
+  "minimum-stability": "dev",
   "license": "MIT",
   "authors": [
     {
@@ -10,7 +10,7 @@
     }
   ],
   "require": {
-    "doctrine/orm": "~2.4",
+    "doctrine/orm": "2.5.0-alpha2",
     "league/container": "~1.2",
     "league/route": "~1.0",
     "league/event": "~2.0",
