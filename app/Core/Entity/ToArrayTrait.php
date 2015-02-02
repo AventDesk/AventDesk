@@ -14,16 +14,15 @@ trait ToArrayTrait
      */
     public function toArray()
     {
+        $array_object = new \ArrayObject();
+
         $vars = get_object_vars($this);
 
-        $data = [];
         foreach ($vars as $key => $value) {
-            $data[] = [
-                $key => $value
-            ];
+            $array_object->offsetSet($key, $value);
         }
 
-        return $data;
+        return $array_object->getArrayCopy();
     }
 }
 
