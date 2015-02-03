@@ -7,6 +7,7 @@ use League\Container\ContainerAwareInterface;
 use League\Container\ContainerAwareTrait;
 use League\Container\ContainerInterface;
 use Avent\Services\Domain\UserRegistrationService;
+use Avent\Services\Domain\UserProfileService;
 
 /**
  * Class DomainServiceFactory
@@ -30,6 +31,14 @@ class DomainServiceFactory implements ContainerAwareInterface
     public function createUserRegistrationService()
     {
         return $this->container->get("Avent\\Services\\Domain\\UserRegistrationService");
+    }
+
+    /**
+     * @return UserProfileService
+     */
+    public function createUserProfileService()
+    {
+        return $this->container->get("Avent\\Services\\Domain\\UserProfileService");
     }
 }
 
