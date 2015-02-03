@@ -23,6 +23,16 @@ trait ServicesFactoryAwareTrait
     private $infrastructure_services;
 
     /**
+     * @param DomainServiceFactory $domain_services
+     * @param InfrastructureServiceFactory $infra_services
+     */
+    public function __construct(DomainServiceFactory $domain_services, InfrastructureServiceFactory $infra_services)
+    {
+        $this->setDomainServicesFactory($domain_services);
+        $this->setInfrastructureServicesFactory($infra_services);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function setDomainServicesFactory(DomainServiceFactory $domain_services)
