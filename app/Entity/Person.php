@@ -125,7 +125,7 @@ class Person implements EntityInterface
 
     public function __construct()
     {
-        $this->article = new ArrayCollection();
+        $this->articles = new ArrayCollection();
     }
 
     /**
@@ -174,6 +174,14 @@ class Person implements EntityInterface
     public function setPhone($phone)
     {
         $this->phone = $phone;
+    }
+
+    /**
+     * @param int $person_id
+     */
+    public function setPersonId($person_id)
+    {
+        $this->person_id = $person_id;
     }
 
     /**
