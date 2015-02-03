@@ -5,7 +5,7 @@ namespace Avent\Response;
 
 use League\Fractal\Manager;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * Class ResponseTrait
@@ -40,7 +40,7 @@ trait ResponseTrait
         return $this;
     }
 
-    public function withValidationError(array $array, ConstraintViolationList $violations, array $headers = [])
+    public function withValidationError(array $array, ConstraintViolationListInterface $violations, array $headers = [])
     {
         $this->response = new Response();
 

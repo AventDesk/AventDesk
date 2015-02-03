@@ -3,7 +3,7 @@
 
 namespace Avent\Services\Domain;
 
-use Avent\CommandBus\Command\UserRegistrationCommand;
+use Avent\Core\CommandBus\CommandInterface;
 use Avent\Entity\Person;
 use Avent\Repository\PersonRepository;
 use Avent\Response\ApiResponse;
@@ -56,10 +56,10 @@ class UserRegistrationService
     }
 
     /**
-     * @param UserRegistrationCommand $command
+     * @param CommandInterface $command
      * @return Response
      */
-    public function register(UserRegistrationCommand $command)
+    public function register(CommandInterface $command)
     {
         $this->event_emitter->emit("before.user.registration", $command);
 
