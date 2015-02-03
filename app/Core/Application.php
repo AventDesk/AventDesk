@@ -31,11 +31,23 @@ class Application implements
 
     private $routes = [];
 
+    private static $instance;
+
     public function __construct()
     {
         $this->setContainer(new Container());
         $this->setEventEmitter(new EventEmitter());
         $this->initService();
+    }
+
+    public function saveApp()
+    {
+        static::$instance = $this;
+    }
+
+    public static function getInstance()
+    {
+        return static::$instance;
     }
 
     protected function addRoute($method, $uri, $callback)
