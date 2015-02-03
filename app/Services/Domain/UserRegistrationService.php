@@ -3,7 +3,9 @@
 
 namespace Avent\Services\Domain;
 
+use Avent\CommandBus\Command\UserRegistrationCommand;
 use Avent\Core\CommandBus\CommandInterface;
+use Avent\Core\Services\DomainServiceInterface;
 use Avent\Entity\Person;
 use Avent\Repository\PersonRepository;
 use Avent\Response\ApiResponse;
@@ -15,7 +17,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Class UserRegistrationService
  * @package Avent\Services\Domain
  */
-class UserRegistrationService
+class UserRegistrationService implements DomainServiceInterface
 {
     /**
      * @var PersonRepository
@@ -58,9 +60,14 @@ class UserRegistrationService
     /**
      * @param CommandInterface $command
      * @return Response
+     * @throws \Exception
      */
-    public function register(CommandInterface $command)
+    public function execute(CommandInterface $command)
     {
+        if (! $command instanceof UserRegistrationCommand) {
+            throw new \Exception(get_class($command) . "must be an instance of UserRegistration Command");
+        }
+
         $this->event_emitter->emit("before.user.registration", $command);
 
         $command->setRepository($this->repository);
