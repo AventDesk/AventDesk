@@ -3,30 +3,32 @@
 
 namespace Avent\ValueObject;
 
+use Avent\Core\ValueObject\ValueObjectInterface;
+
 /**
  * Class Social
  * @package Avent\ValueObject
  * @Embeddable
  */
-class Social
+class Social implements ValueObjectInterface
 {
     /**
      * @Column(type="string", length=64, nullable=true)
      * @var string
      */
-    protected $facebook;
+    public $facebook;
 
     /**
      * @Column(type="string", length=64, nullable=true)
      * @var string
      */
-    protected $twitter;
+    public $twitter;
 
     /**
      * @Column(type="string", length=64, nullable=true)
      * @var string
      */
-    protected $website;
+    public $website;
 
     /**
      * @return string

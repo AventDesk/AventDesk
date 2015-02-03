@@ -3,12 +3,14 @@
 
 namespace Avent\ValueObject;
 
+use Avent\Core\ValueObject\ValueObjectInterface;
+
 /**
  * Class Timestamp
  * @package Avent\ValueObject
  * @Embeddable
  */
-class Timestamp
+class Timestamp implements ValueObjectInterface
 {
     /**
      * @Column(type="date", nullable=true)

@@ -3,42 +3,44 @@
 
 namespace Avent\ValueObject;
 
+use Avent\Core\ValueObject\ValueObjectInterface;
+
 /**
  * Class Address
  * @package Avent\ValueObject
  * @Embeddable
  */
-class Address
+class Address implements ValueObjectInterface
 {
     /**
      * @Column(type="string", length=128, nullable=true)
      * @var string
      */
-    protected $street;
+    public $street;
 
     /**
      * @Column(type="string", length=64, nullable=true)
      * @var string
      */
-    protected $city;
+    public $city;
 
     /**
      * @Column(type="string", length=32, nullable=true)
      * @var string
      */
-    protected $zip_code;
+    public $zip_code;
 
     /**
      * @Column(type="string", length=64, nullable=true)
      * @var string
      */
-    protected $state;
+    public $state;
 
     /**
      * @Column(type="string", length=64, nullable=true)
      * @var string
      */
-    protected $country;
+    public $country;
 
     /**
      * @return string
