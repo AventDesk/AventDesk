@@ -42,12 +42,12 @@ class Application implements
 
     public function saveApp()
     {
-        static::$instance = $this;
+        self::$instance = $this;
     }
 
     public static function getInstance()
     {
-        return static::$instance;
+        return self::$instance;
     }
 
     protected function addRoute($method, $uri, $callback)
