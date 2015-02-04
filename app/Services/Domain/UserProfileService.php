@@ -6,6 +6,7 @@ namespace Avent\Services\Domain;
 use Avent\CommandBus\Command\UserProfileCommand;
 use Avent\Core\CommandBus\CommandInterface;
 use Avent\Core\Event\EventEmitter;
+use Avent\Core\Services\DomainServiceInterface;
 use Avent\Repository\PersonRepository;
 use Avent\Response\ApiResponse;
 use Avent\ValueObject\Address;
@@ -16,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
  * Class UserProfileService
  * @package Avent\Services\Domain
  */
-class UserProfileService
+class UserProfileService implements DomainServiceInterface
 {
     /**
      * @var PersonRepository
@@ -93,7 +94,7 @@ class UserProfileService
 
             $this->repository->save($person);
 
-            $this->event_emitter->emit("before.user.profile.editor", $command);
+            $this->event_emitter->emit("after.user.profile.editor", $command);
             return $response->withArray([
                 "message" => "User profile updated successfully",
                 "data" => $person->toArray()
