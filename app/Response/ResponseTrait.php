@@ -40,6 +40,12 @@ trait ResponseTrait
         return $this;
     }
 
+    /**
+     * @param array $array
+     * @param ConstraintViolationListInterface $violations
+     * @param array $headers
+     * @return $this
+     */
     public function withValidationError(array $array, ConstraintViolationListInterface $violations, array $headers = [])
     {
         $this->response = new Response();
@@ -61,6 +67,10 @@ trait ResponseTrait
         return $this;
     }
 
+    /**
+     * @param int $http_code
+     * @return Response
+     */
     public function send($http_code = Response::HTTP_OK)
     {
         $this->response->setStatusCode($http_code);
@@ -69,6 +79,9 @@ trait ResponseTrait
         return $this->response;
     }
 
+    /**
+     * @param array $headers
+     */
     protected function setHeaders(array $headers)
     {
         foreach ($headers as $key => $value) {
