@@ -1,0 +1,3 @@
+[submodule "puphpet"]
+    path = puphpet
+    url = https://github.com/AventDesk/puphpet
