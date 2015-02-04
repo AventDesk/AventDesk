@@ -43,6 +43,8 @@ $app->getContainer()->singleton("PersonRepository", $repository_mock);
 $app->getContainer()->singleton("EventEmitter", $event_mock);
 $app->getContainer()->singleton("EntityManager", $em_mock);
 $app->getContainer()->singleton("HasherService", $hasher_mock);
+$app->getContainer()->singleton("ValidatorService", "Avent\\Services\\Domain\\ValidatorService")
+    ->withArgument("Validator");
 
 \Doctrine\Common\Annotations\AnnotationRegistry::registerAutoloadNamespace(
     "Symfony\\Component\\Validator\\Constraint",
@@ -53,14 +55,14 @@ $app->getContainer()->singleton("HasherService", $hasher_mock);
 $app->getContainer()->singleton("Avent\\Services\\Domain\\UserRegistrationService")
     ->withArgument("PersonRepository")
     ->withArgument("EventEmitter")
-    ->withArgument("Validator")
+    ->withArgument("ValidatorService")
     ->withArgument("HasherService");
 
 // Register user profile service in container
 $app->getContainer()->singleton("Avent\\Services\\Domain\\UserProfileService")
     ->withArgument("PersonRepository")
     ->withArgument("EventEmitter")
-    ->withArgument("Validator");
+    ->withArgument("ValidatorService");
 
 // Domain service factory
 $app->getContainer()->singleton("DomainServicesFactory", function() use ($app) {
