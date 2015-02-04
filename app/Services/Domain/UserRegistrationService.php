@@ -11,7 +11,6 @@ use Avent\Repository\PersonRepository;
 use Avent\Response\ApiResponse;
 use League\Event\EmitterInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class UserRegistrationService
@@ -25,7 +24,7 @@ class UserRegistrationService implements DomainServiceInterface
     private $repository;
 
     /**
-     * @var ValidatorInterface
+     * @var ValidatorService
      */
     private $validator;
 
@@ -42,13 +41,13 @@ class UserRegistrationService implements DomainServiceInterface
     /**
      * @param PersonRepository $repository
      * @param EmitterInterface $event_emitter
-     * @param ValidatorInterface $validator
+     * @param ValidatorService $validator
      * @param HasherService $hasher
      */
     public function __construct(
         PersonRepository $repository,
         EmitterInterface $event_emitter,
-        ValidatorInterface $validator,
+        ValidatorService $validator,
         HasherService $hasher
     ) {
         $this->repository = $repository;
@@ -79,15 +78,8 @@ class UserRegistrationService implements DomainServiceInterface
         }
 
         try {
-            $violation = $this->validator->validate($command);
-
-            if (count($violation) > 0) {
-                return $response->withValidationError(
-                    [
-                        "message" => "Validation error"
-                    ],
-                    $violation
-                )->send(Response::HTTP_NOT_ACCEPTABLE);
+            if ($violation = $this->validator->validate($command)) {
+                throw new \InvalidArgumentException("Validation failed");
             }
 
             $person = new Person();
@@ -102,6 +94,10 @@ class UserRegistrationService implements DomainServiceInterface
                 "message" => "User created successfully",
                 "data" => $person->toArray()
             ])->send();
+        } catch (\InvalidArgumentException $e) {
+            return $response->withValidationError([
+                $e->getMessage()
+            ], $violation)->send(Response::HTTP_NOT_ACCEPTABLE);
         } catch (\Exception $e) {
             $this->event_emitter->emit("on.error", $e);
             return $response->withArray([

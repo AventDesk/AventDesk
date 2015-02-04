@@ -11,7 +11,6 @@ use Avent\Response\ApiResponse;
 use Avent\ValueObject\Address;
 use Avent\ValueObject\Social;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class UserProfileService
@@ -30,19 +29,19 @@ class UserProfileService
     private $event_emitter;
 
     /**
-     * @var ValidatorInterface
+     * @var ValidatorService
      */
     private $validator;
 
     /**
      * @param PersonRepository $repository
      * @param EventEmitter $event_emitter
-     * @param ValidatorInterface $validator
+     * @param ValidatorService $validator
      */
     public function __construct(
         PersonRepository $repository,
         EventEmitter $event_emitter,
-        ValidatorInterface $validator
+        ValidatorService $validator
     ) {
         $this->repository = $repository;
         $this->event_emitter = $event_emitter;
@@ -67,17 +66,9 @@ class UserProfileService
         $response = ApiResponse::create();
 
         try {
-            $violation = $this->validator->validate($command);
-
-            if (count($violation) > 0) {
-                return $response->withValidationError(
-                    [
-                        "message" => "Validation error"
-                    ],
-                    $violation
-                )->send(Response::HTTP_NOT_ACCEPTABLE);
+            if ($violation = $this->validator->validate($command)) {
+                throw new \InvalidArgumentException("Validation failed");
             }
-
 
             $person = $this->repository->findOneByPersonId($command->getPersonId());
 
@@ -108,6 +99,10 @@ class UserProfileService
                 "data" => $person->toArray()
             ])->send();
 
+        } catch (\InvalidArgumentException $e) {
+            return $response->withValidationError([
+                $e->getMessage()
+            ], $violation)->send(Response::HTTP_NOT_ACCEPTABLE);
         } catch (\Exception $e) {
             $this->event_emitter->emit("on.error", $e);
             return $response->withArray([
