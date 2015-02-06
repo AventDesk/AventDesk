@@ -6,21 +6,11 @@ include __DIR__ . "/../../vendor/autoload.php";
 define("APP_PATH", __DIR__ . "/../../app");
 define("PUBLIC_PATH", __DIR__ . "/../../public");
 
-// Mock dependency
-
-
-$hasher_mock = \Codeception\Util\Stub::make("\\Avent\\Services\\Domain\\HasherService", [
-    "hash" => function () {
-        return "12345";
-    }
-]);
-
 // Create new apps
 $app = new \Avent\Core\Application();
 
 // register dependency in container
-$app->getContainer()->singleton("HasherService", $hasher_mock);
-$app->getContainer()->singleton("ValidatorService", "Avent\\Services\\Domain\\ValidatorService")
+$app->getContainer()->singleton("ValidatorService", "Avent\\Services\\Application\\ValidatorService")
     ->withArgument("Validator");
 
 \Doctrine\Common\Annotations\AnnotationRegistry::registerAutoloadNamespace(

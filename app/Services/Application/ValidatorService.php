@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Avent\Services\Domain;
+namespace Avent\Services\Application;
 
 use Avent\Core\CommandBus\CommandInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;

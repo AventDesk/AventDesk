@@ -10,6 +10,7 @@ use Avent\Core\Services\DomainServiceInterface;
 use Avent\Entity\Company;
 use Avent\Repository\CompanyRepository;
 use Avent\Response\ApiResponse;
+use Avent\Services\Application\ValidatorService;
 use Symfony\Component\HttpFoundation\Response;
 
 /**

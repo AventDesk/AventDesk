@@ -9,6 +9,8 @@ use Avent\Core\Services\DomainServiceInterface;
 use Avent\Entity\Person;
 use Avent\Repository\PersonRepository;
 use Avent\Response\ApiResponse;
+use Avent\Services\Application\HasherService;
+use Avent\Services\Application\ValidatorService;
 use League\Event\EmitterInterface;
 use Symfony\Component\HttpFoundation\Response;
 

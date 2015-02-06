@@ -9,6 +9,7 @@ use Avent\Core\Event\EventEmitter;
 use Avent\Core\Services\DomainServiceInterface;
 use Avent\Repository\PersonRepository;
 use Avent\Response\ApiResponse;
+use Avent\Services\Application\ValidatorService;
 use Avent\ValueObject\Address;
 use Avent\ValueObject\Social;
 use Symfony\Component\HttpFoundation\Response;

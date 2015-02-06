@@ -8,6 +8,12 @@ class UserRegistrationServiceTest extends \PHPUnit_Framework_TestCase
     {
         $this->app = \Avent\Core\Application::getInstance();
 
+        $hasher_mock = \Codeception\Util\Stub::make("\\Avent\\Services\\Application\\HasherService", [
+            "hash" => function () {
+                return "12345";
+            }
+        ]);
+
         $repository_mock = \Codeception\Util\Stub::make("\\Avent\\Repository\\PersonRepository", [
             "save" => function () {
                 return true;
@@ -30,6 +36,7 @@ class UserRegistrationServiceTest extends \PHPUnit_Framework_TestCase
             }
         ]);
 
+        $this->app->getContainer()->singleton("HasherService", $hasher_mock);
         $this->app->getContainer()->singleton("EventEmitter", $event_mock);
         $this->app->getContainer()->singleton("PersonRepository", $repository_mock);
         $this->app->getContainer()->singleton("EntityManager", $em_mock);
