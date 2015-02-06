@@ -9,6 +9,7 @@ use League\Container\ContainerInterface;
 use Avent\Services\Domain\UserRegistrationService;
 use Avent\Services\Domain\UserProfileService;
 use Avent\Services\Domain\CompanyCreatorService;
+use Avent\Services\Domain\UserAuthenticationService;
 
 /**
  * Class DomainServiceFactory
@@ -48,6 +49,14 @@ class DomainServiceFactory implements ContainerAwareInterface
     public function createCompanyCreatorService()
     {
         return $this->container->get("Avent\\Services\\Domain\\CompanyCreatorService");
+    }
+
+    /**
+     * @return UserAuthenticationService
+     */
+    public function createUserAuthenticationService()
+    {
+        return $this->container->get("Avent\\Services\\Domain\\UserAuthenticationService");
     }
 }
 
