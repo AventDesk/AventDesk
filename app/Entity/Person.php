@@ -118,6 +118,12 @@ class Person implements EntityInterface
     protected $opened_tickets;
 
     /**
+     * @OneToOne(targetEntity="ApiKey", mappedBy="person")
+     * @var ApiKey
+     */
+    protected $api_key;
+
+    /**
      * @Embedded(class="Avent\ValueObject\Timestamp", columnPrefix=false)
      * @var Timestamp
      */
@@ -372,6 +378,22 @@ class Person implements EntityInterface
     {
         $ticket->setCreator($this);
         $this->opened_tickets[] = $ticket;
+    }
+
+    /**
+     * @return ApiKey
+     */
+    public function getApiKey()
+    {
+        return $this->api_key;
+    }
+
+    /**
+     * @param ApiKey $api_key
+     */
+    public function setApiKey(ApiKey $api_key)
+    {
+        $this->api_key = $api_key;
     }
 }
 
