@@ -14,7 +14,6 @@ use Avent\Repository\PersonRepository;
 use Avent\Response\ApiResponse;
 use Avent\Services\Application\ValidatorService;
 use League\Route\Http\Exception;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class UserAuthenticationService
@@ -38,7 +37,7 @@ class UserAuthenticationService implements DomainServiceInterface
     private $event_emitter;
 
     /**
-     * @var ValidatorInterface
+     * @var ValidatorService
      */
     private $validator;
 
