@@ -75,15 +75,7 @@ class UserAuthenticationService implements DomainServiceInterface
             throw new \DomainException($message);
         }
 
-        $person = $this->person_repository->findOneBy(["email" => $command->getEmail()]);
-
-        if (is_null($person)) {
-            throw new \DomainException("Email not found in database");
-        }
-
-        if (! password_verify($command->getPassword(), $person->getPassword())) {
-            throw new \DomainException("Invalid email or password");
-        }
+        $person = $this->verifyPassword($command->getPassword(), $command->getPassword());
 
         $api_key = $this->apikey_repository->findOneBy(["person_id" => $person->getPersonId()]);
 
@@ -114,6 +106,26 @@ class UserAuthenticationService implements DomainServiceInterface
         $this->apikey_repository->save($api_key);
 
         return $api_key;
+    }
+
+    /**
+     * @param $email
+     * @param $password
+     * @return Person
+     */
+    private function verifyPassword($email, $password)
+    {
+        $person = $this->person_repository->findOneBy(["email" => $email]);
+
+        if (is_null($person)) {
+            throw new \DomainException("Email not found in database");
+        }
+
+        if (! password_verify($password, $person->getPassword())) {
+            throw new \DomainException("Invalid email or password");
+        }
+
+        return $person;
     }
 }
 
