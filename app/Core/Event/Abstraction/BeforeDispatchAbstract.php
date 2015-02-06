@@ -8,7 +8,6 @@ use Avent\Core\Event\EventListenerInterface;
 use Avent\Core\Event\IsListenerTrait;
 use Avent\Core\Logger\LoggerAwareInterface;
 use Avent\Core\Logger\LoggerAwareTrait;
-use FastRoute\Dispatcher;
 use League\Event\EventInterface;
 use Monolog\Logger;
 
@@ -23,10 +22,8 @@ abstract class BeforeDispatchAbstract implements EventListenerInterface, LoggerA
 
     /**
      * @param EventInterface $event
-     * @param Dispatcher $dispatcher
-     * @return boolean
      */
-    abstract public function handle(EventInterface $event, Dispatcher $dispatcher = null);
+    abstract public function handle(EventInterface $event);
 
     /**
      * @param Logger $logger
