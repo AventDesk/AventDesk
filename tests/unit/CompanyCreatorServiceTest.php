@@ -22,6 +22,13 @@ class CompanyCreatorServiceTest extends \PHPUnit_Framework_TestCase
             "getRepository" => $repository_mock
         ]);
 
+        $event_mock = \Codeception\Util\Stub::make("\\Avent\\Core\\Event\\EventEmitter", [
+            "emit" => function () {
+                return true;
+            }
+        ]);
+
+        $this->app->getContainer()->singleton("EventEmitter", $event_mock);
         $this->app->getContainer()->singleton("CompanyRepository", $repository_mock);
         $this->app->getContainer()->singleton("EntityManager", $em_mock);
 

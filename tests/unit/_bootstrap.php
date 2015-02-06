@@ -7,11 +7,7 @@ define("APP_PATH", __DIR__ . "/../../app");
 define("PUBLIC_PATH", __DIR__ . "/../../public");
 
 // Mock dependency
-$event_mock = \Codeception\Util\Stub::make("\\Avent\\Core\\Event\\EventEmitter", [
-    "emit" => function () {
-        return true;
-    }
-]);
+
 
 $hasher_mock = \Codeception\Util\Stub::make("\\Avent\\Services\\Domain\\HasherService", [
     "hash" => function () {
@@ -23,7 +19,6 @@ $hasher_mock = \Codeception\Util\Stub::make("\\Avent\\Services\\Domain\\HasherSe
 $app = new \Avent\Core\Application();
 
 // register dependency in container
-$app->getContainer()->singleton("EventEmitter", $event_mock);
 $app->getContainer()->singleton("HasherService", $hasher_mock);
 $app->getContainer()->singleton("ValidatorService", "Avent\\Services\\Domain\\ValidatorService")
     ->withArgument("Validator");
@@ -43,8 +38,6 @@ $app->getContainer()->singleton("DomainServicesFactory", function() use ($app) {
 $app->getContainer()->singleton("InfrastructureServicesFactory", function () use ($app) {
     return new \Avent\Services\InfrastructureServiceFactory($app->getContainer());
 });
-
-// StubHandler for testing command bus
 
 // Save app
 $app->saveApp();
