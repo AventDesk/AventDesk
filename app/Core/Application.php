@@ -9,6 +9,7 @@ use Avent\Core\Event\EventEmitter;
 use Avent\Core\Event\EventEmitterAwareInterface;
 use Avent\Core\Event\EventEmitterAwareTrait;
 use Avent\Core\Logger\HandlerCreator;
+use Avent\Response\ApiResponse;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use League\Container\Container;
@@ -18,6 +19,7 @@ use League\Route\RouteCollection;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Validation;
 
 class Application implements
@@ -29,7 +31,7 @@ class Application implements
     use ContainerAwareTrait;
     use EntityManagerAwareTrait;
 
-    private $routes = [];
+    public $routes = [];
 
     private static $instance;
 
@@ -50,47 +52,45 @@ class Application implements
         return self::$instance;
     }
 
-    protected function addRoute($method, $uri, $callback)
+    protected function addRoute($method, $uri, $callback, $level = 0)
     {
         if (($callback instanceof \Closure)) {
-            $this->routes[] = [$method, $uri, serialize($callback)];
+            $this->routes[] = [$method, $uri, $callback, $level];
         } else {
-            $this->routes[] = [$method, $uri, $callback];
+            $this->routes[] = [$method, $uri, $callback, $level];
             list($class_name) = explode("::", $callback);
             $this->getContainer()->singleton($class_name)
                 ->withArguments(["EventEmitter", "CommandBus"]);
         }
     }
 
-    public function post($uri, $callback)
+    public function post($uri, $callback, $level = 0)
     {
-        $this->addRoute("POST", $uri, $callback);
+        $this->addRoute("POST", $uri, $callback, $level);
     }
 
-    public function get($uri, $callback)
+    public function get($uri, $callback, $level = 0)
     {
-        $this->addRoute("GET", $uri, $callback);
+        $this->addRoute("GET", $uri, $callback, $level);
     }
 
-    public function put($uri, $callback)
+    public function put($uri, $callback, $level = 0)
     {
-        $this->addRoute("PUT", $uri, $callback);
+        $this->addRoute("PUT", $uri, $callback, $level);
     }
 
-    public function delete($uri, $callback)
+    public function delete($uri, $callback, $level = 0)
     {
-        $this->addRoute("DELETE", $uri, $callback);
+        $this->addRoute("DELETE", $uri, $callback, $level);
     }
 
-    public function registerEvent($listener, $priority = EventEmitter::P_NORMAL)
+    public function registerEvent($listener, $arguments = ["Logger"], $priority = EventEmitter::P_NORMAL)
     {
         $this->container->singleton($listener)
-            ->withArguments(["Logger"]);
+            ->withArguments($arguments);
         $this->getEventEmitter()->addListener(
             $listener::getEventName(),
-            function ($event) use ($listener) {
-                 return $this->container->get($listener)->handle($event);
-            },
+            $listener,
             $priority
         );
     }
@@ -110,7 +110,9 @@ class Application implements
     public function run()
     {
         $this->getEventEmitter()->setContainer($this->getContainer());
-        $this->getEventEmitter()->emit("before.app");
+        if ($this->getEventEmitter()->emit(EventEmitter::AFTER_APP)->isPropagationStopped()) {
+            throw new \RuntimeException("Application cancelled by domain events");
+        }
 
         $router = new RouteCollection($this->getContainer());
 
@@ -120,15 +122,21 @@ class Application implements
 
         $dispatcher = $router->getDispatcher();
 
-        $this->getEventEmitter()->emit("before.dispatch");
+        if ($this->getEventEmitter()->emit(EventEmitter::BEFORE_DISPATCH)->isPropagationStopped()) {
+            throw new \RuntimeException("Application cancelled by domain events");
+        }
+
+        if ($this->getEventEmitter()->emit("security.event")->isPropagationStopped()) {
+            throw new \DomainException("Your access token not sufficient to access this method");
+        }
 
         $response = $dispatcher->dispatch(strtoupper($_SERVER["REQUEST_METHOD"]), $_SERVER["REQUEST_URI"]);
 
-        $this->getEventEmitter()->emit("after.dispatch");
+        $this->getEventEmitter()->emit(EventEmitter::AFTER_DISPATCH);
 
         $response->send();
 
-        $this->getEventEmitter()->emit("after.app");
+        $this->getEventEmitter()->emit(EventEmitter::AFTER_APP);
     }
 
     protected function initService()
