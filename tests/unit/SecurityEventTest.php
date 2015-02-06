@@ -44,6 +44,8 @@ class SecurityEventTest extends \PHPUnit_Framework_TestCase
                 "ApiKeyRepository"
             ]
         );
+
+        $this->app->getEventEmitter()->setContainer($this->app->getContainer());
     }
 
     public function tearDown()
