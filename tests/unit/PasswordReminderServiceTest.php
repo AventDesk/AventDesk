@@ -26,9 +26,7 @@ class PasswordReminderServiceTest extends \PHPUnit_Framework_TestCase
             "\\Avent\\Repository\\PasswordReminderRepository",
             [
                 "save" => function () {
-                    $password_remind = new \Avent\Entity\PasswordReminder();
-                    $password_remind->setCode("1234567890");
-                    return $password_remind;
+                    return true;
                 }
             ]
         );
@@ -69,7 +67,7 @@ class PasswordReminderServiceTest extends \PHPUnit_Framework_TestCase
 
         $array_response = json_decode($response->getContent());
 
-        $this->assertSame("1234567890", $array_response->data->code);
+        $this->assertTrue($array_response->data->is_active);
     }
 }
 

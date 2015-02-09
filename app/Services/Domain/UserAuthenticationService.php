@@ -69,8 +69,6 @@ class UserAuthenticationService implements DomainServiceInterface
                 "must be an instance of UserAuthenticationCommand Command");
         }
 
-        $this->event_emitter->emit("before.user.auth");
-
         if ($violation = $this->validator->validate($command)) {
             $message = $violation->get(0)->getMessage();
             throw new \DomainException($message);
@@ -83,8 +81,6 @@ class UserAuthenticationService implements DomainServiceInterface
         if (is_null($api_key)) {
             $api_key = $this->generateApiKey($person);
         }
-
-        $this->event_emitter->emit("after.user.auth");
 
         return ApiResponse::create()->withArray(
             [

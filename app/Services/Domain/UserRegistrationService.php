@@ -61,51 +61,37 @@ class UserRegistrationService implements DomainServiceInterface
     /**
      * @param CommandInterface $command
      * @return Response
-     * @throws \Exception
      */
     public function execute(CommandInterface $command)
     {
-        if (! $command instanceof UserRegistrationCommand) {
-            throw new \Exception(get_class($command) . "must be an instance of UserRegistration Command");
-        }
-
-        $this->event_emitter->emit("before.user.registration", $command);
-
         $command->setRepository($this->repository);
 
-        $response = ApiResponse::create();
-
         if ($command->getPassword() == null) {
-                $command->setPassword((string) rand(1000, 9999));
+            $command->setPassword((string) rand(1000, 9999));
         }
 
-        try {
-            if ($violation = $this->validator->validate($command)) {
-                throw new \InvalidArgumentException("Validation failed");
-            }
-
-            $person = new Person();
-            $person->setEmail($command->getEmail());
-            $person->setPassword($this->hasher->hash($command->getPassword()));
-
-            $this->repository->save($person);
-
-            $this->event_emitter->emit("after.user.registration", $command);
-
-            return $response->withArray([
-                "message" => "User created successfully",
-                "data" => $person->toArray()
-            ])->send();
-        } catch (\InvalidArgumentException $e) {
-            return $response->withValidationError([
-                $e->getMessage()
-            ], $violation)->send(Response::HTTP_NOT_ACCEPTABLE);
-        } catch (\Exception $e) {
-            $this->event_emitter->emit("on.error", $e);
-            return $response->withArray([
-                "message" => "Oops something went wrong"
-            ])->send(Response::HTTP_INTERNAL_SERVER_ERROR);
+        if (! $command instanceof UserRegistrationCommand) {
+            throw new \DomainException(get_class($command) .
+                "must be an instance of UserRegistration Command");
         }
+
+        if ($violation = $this->validator->validate($command)) {
+            $message = $violation->get(0)->getPropertyPath() . ":" . $violation->get(0)->getMessage();
+            throw new \DomainException($message);
+        }
+
+        $person = new Person();
+        $person->setEmail($command->getEmail());
+        $person->setPassword($this->hasher->hash($command->getPassword()));
+
+        $this->repository->save($person);
+
+        $this->event_emitter->emit("after.user.registration", $command);
+
+        return ApiResponse::create()->withArray([
+            "message" => "User created successfully",
+            "data" => $person->toArray()
+        ])->send();
     }
 }
 

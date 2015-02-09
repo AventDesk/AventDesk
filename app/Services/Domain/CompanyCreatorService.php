@@ -56,46 +56,31 @@ class CompanyCreatorService implements DomainServiceInterface
      */
     public function execute(CommandInterface $command)
     {
+        $command->setRepository($this->repository);
+
         if (! $command instanceof CompanyCreatorCommand) {
-            throw new \Exception(get_class($command) .
+            throw new \DomainException(get_class($command) .
                 "must be an instance of CompanyCreatorCommand Command");
         }
 
-        $this->event_emitter->emit("before.create.company", $command);
-
-        $command->setRepository($this->repository);
-
-        $response = ApiResponse::create();
-
-        try {
-            if ($violation = $this->validator->validate($command)) {
-                throw new \InvalidArgumentException("Validation error");
-            }
-
-            $company = new Company();
-            $company->setSocial($command->getSocial());
-            $company->setAddress($command->getAddress());
-            $company->setEmail($command->getEmail());
-            $company->setCompanyName($command->getCompanyName());
-            $company->setPhone($command->getCompanyPhone());
-
-            $this->repository->save($company);
-
-            $this->event_emitter->emit("after.create.company", $command);
-            return $response->withArray([
-                "message" => "Company created successfully",
-                "data" => $company->toArray()
-            ])->send();
-        } catch (\InvalidArgumentException $e) {
-            return $response->withValidationError([
-                $e->getMessage()
-            ], $violation)->send(Response::HTTP_NOT_ACCEPTABLE);
-        } catch (\Exception $e) {
-            $this->event_emitter->emit("on.error", $e);
-            return $response->withArray([
-                "message" => "Oops something went wrong"
-            ])->send(Response::HTTP_INTERNAL_SERVER_ERROR);
+        if ($violation = $this->validator->validate($command)) {
+            $message = $violation->get(0)->getMessage();
+            throw new \DomainException($message);
         }
+
+        $company = new Company();
+        $company->setSocial($command->getSocial());
+        $company->setAddress($command->getAddress());
+        $company->setEmail($command->getEmail());
+        $company->setCompanyName($command->getCompanyName());
+        $company->setPhone($command->getCompanyPhone());
+
+        $this->repository->save($company);
+
+        return ApiResponse::create()->withArray([
+            "message" => "Company created successfully",
+            "data" => $company->toArray()
+        ])->send();
     }
 }
 

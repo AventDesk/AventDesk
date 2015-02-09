@@ -64,12 +64,12 @@ class PasswordReminderService implements DomainServiceInterface
      */
     public function execute(CommandInterface $command)
     {
+        $command->setRepository($this->person_repository);
+
         if (! $command instanceof PasswordReminderCommand) {
             throw new \DomainException(get_class($command) .
                 "must be an instance of PasswordReminderCommand Command");
         }
-
-        $command->setRepository($this->person_repository);
 
         if ($violation = $this->validator->validate($command)) {
             $message = $violation->get(0)->getMessage();
@@ -87,7 +87,7 @@ class PasswordReminderService implements DomainServiceInterface
 
         return ApiResponse::create()->withArray(
             [
-                "message" => "Authentication success",
+                "message" => "Password reminder code successfully created",
                 "data" => $password_reminder->toArray()
             ]
         )->send();
