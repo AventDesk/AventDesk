@@ -12,7 +12,6 @@ use Avent\Response\ApiResponse;
 use Avent\Services\Application\HasherService;
 use Avent\Services\Application\ValidatorService;
 use League\Event\EmitterInterface;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class UserRegistrationService
@@ -60,11 +59,16 @@ class UserRegistrationService implements DomainServiceInterface
 
     /**
      * @param CommandInterface $command
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function execute(CommandInterface $command)
     {
         $command->setRepository($this->repository);
+
+        if (! $command instanceof UserRegistrationCommand) {
+            throw new \DomainException(get_class($command) .
+                "must be an instance of UserRegistrationCommand Command");
+        }
 
         if ($command->getPassword() == null) {
             $command->setPassword((string) rand(1000, 9999));

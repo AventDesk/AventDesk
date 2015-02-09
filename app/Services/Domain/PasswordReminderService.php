@@ -72,7 +72,7 @@ class PasswordReminderService implements DomainServiceInterface
         }
 
         if ($violation = $this->validator->validate($command)) {
-            $message = $violation->get(0)->getMessage();
+            $message = $violation->get(0)->getPropertyPath() . ":" . $violation->get(0)->getMessage();
             throw new \DomainException($message);
         }
 

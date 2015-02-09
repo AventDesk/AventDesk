@@ -11,7 +11,6 @@ use Avent\Entity\Company;
 use Avent\Repository\CompanyRepository;
 use Avent\Response\ApiResponse;
 use Avent\Services\Application\ValidatorService;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class CompanyCreatorService
@@ -51,8 +50,7 @@ class CompanyCreatorService implements DomainServiceInterface
 
     /**
      * @param CommandInterface $command
-     * @return Response
-     * @throws \Exception
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function execute(CommandInterface $command)
     {

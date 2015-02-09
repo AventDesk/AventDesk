@@ -12,7 +12,6 @@ use Avent\Response\ApiResponse;
 use Avent\Services\Application\ValidatorService;
 use Avent\ValueObject\Address;
 use Avent\ValueObject\Social;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class UserProfileService
@@ -52,8 +51,7 @@ class UserProfileService implements DomainServiceInterface
 
     /**
      * @param CommandInterface $command
-     * @return Response
-     * @throws \Exception
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function execute(CommandInterface $command)
     {
@@ -65,7 +63,7 @@ class UserProfileService implements DomainServiceInterface
         }
 
         if ($violation = $this->validator->validate($command)) {
-            $message = $violation->get(0)->getMessage();
+            $message = $violation->get(0)->getPropertyPath() . ":" . $violation->get(0)->getMessage();
             throw new \DomainException($message);
         }
 

@@ -5,6 +5,8 @@ namespace Avent\CommandBus\Command;
 
 use Avent\Core\CommandBus\CommandInterface;
 use Avent\Core\Repository\RepositoryAwareTrait;
+use Avent\Entity\Person;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class UserProfileCommand
@@ -243,6 +245,16 @@ class UserProfileCommand implements CommandInterface
     public function setFacebook($facebook)
     {
         $this->facebook = $facebook;
+    }
+
+    /**
+     * @Assert\True(message = "User not exist in database")
+     */
+    public function isPersonExist()
+    {
+        $person = $this->repository->findOneBy(["person_id" => $this->getPersonId()]);
+
+        return ($person instanceof Person) ? true : false;
     }
 }
 

@@ -60,7 +60,8 @@ class UserAuthenticationService implements DomainServiceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param CommandInterface $command
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function execute(CommandInterface $command)
     {
@@ -70,7 +71,7 @@ class UserAuthenticationService implements DomainServiceInterface
         }
 
         if ($violation = $this->validator->validate($command)) {
-            $message = $violation->get(0)->getMessage();
+            $message = $violation->get(0)->getPropertyPath() . ":" . $violation->get(0)->getMessage();
             throw new \DomainException($message);
         }
 
