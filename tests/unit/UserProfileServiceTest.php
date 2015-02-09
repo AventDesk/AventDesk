@@ -13,7 +13,7 @@ class UserProfileServiceTest extends \PHPUnit_Framework_TestCase
                 return true;
             },
             "findOneBy" => function () {
-                return true;
+                return new \Avent\Entity\Person();
             },
             "findOneByPersonId" => function () {
                 return new \Avent\Entity\Person();
@@ -33,7 +33,6 @@ class UserProfileServiceTest extends \PHPUnit_Framework_TestCase
         $this->app->getContainer()->singleton("EventEmitter", $event_mock);
         $this->app->getContainer()->singleton("PersonRepository", $repository_mock);
         $this->app->getContainer()->singleton("EntityManager", $em_mock);
-        
         $this->app->getContainer()->singleton("Avent\\Services\\Domain\\UserProfileService")
             ->withArgument("PersonRepository")
             ->withArgument("EventEmitter")

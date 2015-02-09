@@ -57,61 +57,41 @@ class UserProfileService implements DomainServiceInterface
      */
     public function execute(CommandInterface $command)
     {
+        $command->setRepository($this->repository);
+
         if (! $command instanceof UserProfileCommand) {
-            throw new \Exception(get_class($command) .
+            throw new \DomainException(get_class($command) .
                 "must be an instance of UserProfileCommand Command");
         }
 
-        $this->event_emitter->emit("before.user.profile.editor", $command);
-
-        $command->setRepository($this->repository);
-
-        $response = ApiResponse::create();
-
-        try {
-            if ($violation = $this->validator->validate($command)) {
-                throw new \InvalidArgumentException("Validation failed");
-            }
-
-            $person = $this->repository->findOneByPersonId($command->getPersonId());
-
-            if ($person == null) {
-                throw new \Exception("Person not found");
-            }
-
-            $address = new Address();
-            $address->setCity($command->getCity());
-            $address->setCountry($command->getCountry());
-            $address->setState($command->getState());
-            $address->setStreet($command->getStreet());
-            $address->setZipCode($command->getZipCode());
-
-            $social = new Social();
-            $social->setFacebook($command->getFacebook());
-            $social->setTwitter($command->getTwitter());
-            $social->setWebsite($command->getWebsite());
-
-            $person->setAddress($address);
-            $person->setSocial($social);
-
-            $this->repository->save($person);
-
-            $this->event_emitter->emit("after.user.profile.editor", $command);
-            return $response->withArray([
-                "message" => "User profile updated successfully",
-                "data" => $person->toArray()
-            ])->send();
-
-        } catch (\InvalidArgumentException $e) {
-            return $response->withValidationError([
-                $e->getMessage()
-            ], $violation)->send(Response::HTTP_NOT_ACCEPTABLE);
-        } catch (\Exception $e) {
-            $this->event_emitter->emit("on.error", $e);
-            return $response->withArray([
-                "message" => "Oops something went wrong"
-            ])->send(Response::HTTP_INTERNAL_SERVER_ERROR);
+        if ($violation = $this->validator->validate($command)) {
+            $message = $violation->get(0)->getMessage();
+            throw new \DomainException($message);
         }
+
+        $person = $this->repository->findOneByPersonId($command->getPersonId());
+
+        $address = new Address();
+        $address->setCity($command->getCity());
+        $address->setCountry($command->getCountry());
+        $address->setState($command->getState());
+        $address->setStreet($command->getStreet());
+        $address->setZipCode($command->getZipCode());
+
+        $social = new Social();
+        $social->setFacebook($command->getFacebook());
+        $social->setTwitter($command->getTwitter());
+        $social->setWebsite($command->getWebsite());
+
+        $person->setAddress($address);
+        $person->setSocial($social);
+
+        $this->repository->save($person);
+
+        return ApiResponse::create()->withArray([
+            "message" => "User profile updated successfully",
+            "data" => $person->toArray()
+        ])->send();
     }
 }
 
