@@ -10,6 +10,7 @@ use Avent\Services\Domain\UserRegistrationService;
 use Avent\Services\Domain\UserProfileService;
 use Avent\Services\Domain\CompanyCreatorService;
 use Avent\Services\Domain\UserAuthenticationService;
+use Avent\Services\Domain\PasswordReminderService;
 
 /**
  * Class DomainServiceFactory
@@ -57,6 +58,14 @@ class DomainServiceFactory implements ContainerAwareInterface
     public function createUserAuthenticationService()
     {
         return $this->container->get("Avent\\Services\\Domain\\UserAuthenticationService");
+    }
+
+    /**
+     * @return PasswordReminderService
+     */
+    public function createPasswordReminderService()
+    {
+        return $this->container->get("Avent\\Services\\Domain\\PasswordReminderService");
     }
 }
 
