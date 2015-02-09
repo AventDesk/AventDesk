@@ -64,8 +64,9 @@ class UserAuthenticationService implements DomainServiceInterface
      */
     public function execute(CommandInterface $command)
     {
-        if (! $command instanceof UserAuthenticationCommand) {
-            throw new \DomainException(get_class($command) . "must be an instance of UserRegistration Command");
+        if (!$command instanceof UserAuthenticationCommand) {
+            throw new \DomainException(get_class($command) .
+                "must be an instance of UserAuthenticationCommand Command");
         }
 
         $this->event_emitter->emit("before.user.auth");
@@ -121,7 +122,7 @@ class UserAuthenticationService implements DomainServiceInterface
             throw new \DomainException("Email not found in database");
         }
 
-        if (! password_verify($password, $person->getPassword())) {
+        if (!password_verify($password, $person->getPassword())) {
             throw new \DomainException("Invalid email or password");
         }
 

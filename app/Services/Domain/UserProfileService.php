@@ -58,7 +58,8 @@ class UserProfileService implements DomainServiceInterface
     public function execute(CommandInterface $command)
     {
         if (! $command instanceof UserProfileCommand) {
-            throw new \Exception(get_class($command) . "must be an instance of UserRegistration Command");
+            throw new \Exception(get_class($command) .
+                "must be an instance of UserProfileCommand Command");
         }
 
         $this->event_emitter->emit("before.user.profile.editor", $command);

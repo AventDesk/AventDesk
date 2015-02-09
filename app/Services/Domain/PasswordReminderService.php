@@ -83,7 +83,7 @@ class PasswordReminderService implements DomainServiceInterface
         $password_reminder->setIsActive(true);
         $password_reminder->setTimestamp(new Timestamp());
 
-        $password_reminder = $this->password_remind_repository->save($password_reminder);
+        $this->password_remind_repository->save($password_reminder);
 
         return ApiResponse::create()->withArray(
             [
