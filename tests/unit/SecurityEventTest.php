@@ -13,19 +13,6 @@ class SecurityEventTest extends \PHPUnit_Framework_TestCase
     {
         $this->app = \Avent\Core\Application::getInstance();
 
-        $repository_mock = \Codeception\Util\Stub::make(
-            "\\Avent\\Repository\\ApiKeyRepository",
-            [
-                "findOneBy" => function() {
-                    $key = new \Avent\Entity\ApiKey();
-                    $key->setApiKey("123");
-                    $key->setLevel(4);
-                    return $key;
-                }
-            ]
-        );
-
-
         $this->app->get(
             "/hello-world",
             function () {
@@ -34,7 +21,6 @@ class SecurityEventTest extends \PHPUnit_Framework_TestCase
             5
         );
 
-        $this->app->getContainer()->singleton("ApiKeyRepository", $repository_mock);
         $this->app->getContainer()->singleton("JwtService", function () {
             return new \Avent\Services\Application\JwtService("secret");
         });
@@ -46,7 +32,6 @@ class SecurityEventTest extends \PHPUnit_Framework_TestCase
             "\\Avent\\Events\\SecurityHook",
             [
                 "Logger",
-                "ApiKeyRepository",
                 "JwtService"
             ]
         );
