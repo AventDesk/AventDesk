@@ -4,10 +4,13 @@
 namespace Avent\Core\Event;
 
 use Avent\Core\Event\Exception\InvalidEventNameException;
+use Codeception\Util\Debug;
 use League\Container\ContainerAwareInterface;
 use League\Container\ContainerAwareTrait;
+use League\Event\CallbackListener;
 use League\Event\Emitter;
 use League\Event\EventInterface;
+use League\Event\ListenerInterface;
 
 /**
  * Class EventEmitter
@@ -77,20 +80,6 @@ class EventEmitter extends Emitter implements ContainerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function emit($event)
-    {
-        list($name, $event) = $this->prepareEvent($event);
-        $arguments = [$event] + func_get_args();
-
-        $this->invokeListeners($name, $event, $arguments);
-        $this->invokeListeners("*", $event, $arguments);
-
-        return $event;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function invokeListeners($name, EventInterface $event, array $arguments)
     {
         $listeners = $this->getListeners($name);
@@ -100,12 +89,34 @@ class EventEmitter extends Emitter implements ContainerAwareInterface
                 break;
             }
 
-            $listener = $this->getContainer()->get($listener);
-
-            $this->ensureListener($listener);
+            $listener =$this->ensureListener($listener);
 
             call_user_func_array([$listener, "handle"], $arguments);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function ensureListener($listener)
+    {
+        if ($listener instanceof ListenerInterface) {
+            return $listener;
+        }
+
+        if (is_callable($listener)) {
+            return CallbackListener::fromCallable($listener);
+        }
+
+        // If we pass reference in container then resolve it
+        if (($listener = $this->container->get($listener)) != null) {
+            return $listener;
+        }
+
+        throw new \InvalidArgumentException(
+            'Listeners should be be ListenerInterface, Closure or callable. Received type: '.gettype($listener)
+        );
+
     }
 }
 
