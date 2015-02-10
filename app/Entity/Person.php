@@ -118,6 +118,12 @@ class Person implements EntityInterface
     protected $opened_tickets;
 
     /**
+     * @OneToMany(targetEntity="PasswordReminder", mappedBy="reminder_id")
+     * @var ArrayCollection
+     */
+    protected $password_remainders;
+
+    /**
      * @OneToOne(targetEntity="ApiKey", mappedBy="person")
      * @var ApiKey
      */
@@ -129,9 +135,15 @@ class Person implements EntityInterface
      */
     protected $timestamp;
 
+    /**
+     * return void
+     */
     public function __construct()
     {
         $this->articles = new ArrayCollection();
+        $this->password_remainders = new ArrayCollection();
+        $this->assigned_tickets = new ArrayCollection();
+        $this->opened_tickets = new ArrayCollection();
     }
 
     /**
@@ -395,6 +407,25 @@ class Person implements EntityInterface
     {
         $this->api_key = $api_key;
     }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getPasswordRemainders()
+    {
+        return $this->password_remainders;
+    }
+
+    /**
+     * @param PasswordReminder $password_reminder
+     */
+    public function setPasswordRemainders(PasswordReminder $password_reminder)
+    {
+        $password_reminder->setPerson($this);
+        $this->password_remainders[] = $password_reminder;
+    }
+
+
 }
 
 // EOF

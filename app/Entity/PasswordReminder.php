@@ -10,7 +10,7 @@ use Avent\ValueObject\Timestamp;
  * Class PasswordReminder
  * @package Avent\Entity
  * @Entity(repositoryClass="Avent\Repository\PasswordRemainderRepository")
- * @Table(name="password_reminder)
+ * @Table(name="password_reminder")
  */
 class PasswordReminder
 {
@@ -33,6 +33,7 @@ class PasswordReminder
 
     /**
      * @ManyToOne(targetEntity="Person", inversedBy="password_remainders")
+     * @JoinColumn(name="person_id", referencedColumnName="person_id")
      * @var Person
      */
     protected $person;
