@@ -12,6 +12,7 @@ use Avent\Entity\Person;
 use Avent\Repository\ApiKeyRepository;
 use Avent\Repository\PersonRepository;
 use Avent\Response\ApiResponse;
+use Avent\Services\Application\JwtService;
 use Avent\Services\Application\ValidatorService;
 use League\Route\Http\Exception;
 
@@ -42,21 +43,29 @@ class UserAuthenticationService implements DomainServiceInterface
     private $validator;
 
     /**
+     * @var JwtService
+     */
+    private $jwt;
+
+    /**
      * @param PersonRepository $person_repository
      * @param ApiKeyRepository $apikey_repository
      * @param EventEmitter $event_emitter
      * @param ValidatorService $validator
+     * @param JwtService $jwt
      */
     public function __construct(
         PersonRepository $person_repository,
         ApiKeyRepository $apikey_repository,
         EventEmitter $event_emitter,
-        ValidatorService $validator
+        ValidatorService $validator,
+        JwtService $jwt
     ) {
         $this->person_repository = $person_repository;
         $this->apikey_repository = $apikey_repository;
         $this->event_emitter = $event_emitter;
         $this->validator = $validator;
+        $this->jwt = $jwt;
     }
 
     /**
@@ -83,10 +92,20 @@ class UserAuthenticationService implements DomainServiceInterface
             $api_key = $this->generateApiKey($person);
         }
 
+        $token = $this->jwt->encode(
+            [
+                "person_id" => $person->getPersonId(),
+                "api_key" => $api_key->getApiKey(),
+                "level" => $api_key->getLevel(),
+            ]
+        );
+
         return ApiResponse::create()->withArray(
             [
                 "message" => "Authentication success",
-                "data" => $api_key->toArray()
+                "data" => [
+                    "token" => $token
+                ]
             ]
         )->send();
     }

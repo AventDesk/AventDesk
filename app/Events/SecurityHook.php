@@ -5,6 +5,7 @@ namespace Avent\Events;
 
 use Avent\Core\Event\Abstraction\SecurityEventAbstract;
 use Avent\Repository\ApiKeyRepository;
+use Avent\Services\Application\JwtService;
 use FastRoute\Dispatcher;
 use League\Event\EventInterface;
 use Monolog\Logger;
@@ -16,18 +17,18 @@ use Monolog\Logger;
 class SecurityHook extends SecurityEventAbstract
 {
     /**
-     * @var ApiKeyRepository
+     * @var JwtService
      */
-    protected $repository;
+    protected $jwt;
 
     /**
      * @param Logger $logger
-     * @param ApiKeyRepository $repository
+     * @param JwtService $jwt
      */
-    public function __construct(Logger $logger, ApiKeyRepository $repository = null)
+    public function __construct(Logger $logger, JwtService $jwt = null)
     {
         parent::__construct($logger);
-        $this->repository = $repository;
+        $this->jwt = $jwt;
     }
 
     /**
@@ -45,9 +46,9 @@ class SecurityHook extends SecurityEventAbstract
                     return;
                 }
 
-                $key = $this->repository->findOneBy(["api_key" => $request["api_key"]]);
+                $key = $this->jwt->decode($request["token"]);
 
-                if ((!($key->getLevel() >= $rule[3])) || is_null($key)) {
+                if ((!($key->level >= $rule[3])) || is_null($key)) {
                     $event->stopPropagation();
                 }
             }

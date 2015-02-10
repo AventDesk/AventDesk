@@ -27,6 +27,7 @@ class UserAuthenticationServiceTest extends \PHPUnit_Framework_TestCase
                 "findOneBy" => function () {
                     $key = new \Avent\Entity\ApiKey();
                     $key->setApiKey("12345678");
+                    $key->setLevel(4);
                     return $key;
                 },
                 "save" => function () {
@@ -44,12 +45,16 @@ class UserAuthenticationServiceTest extends \PHPUnit_Framework_TestCase
         $this->app->getContainer()->singleton("PersonRepository", $person_repository);
         $this->app->getContainer()->singleton("ApiKeyRepository", $api_key_repository);
         $this->app->getContainer()->singleton("EventEmitter", $event_mock);
+        $this->app->getContainer()->singleton("JwtService", function () {
+            return new \Avent\Services\Application\JwtService("secret");
+        });
 
         $this->app->getContainer()->singleton("Avent\\Services\\Domain\\UserAuthenticationService")
             ->withArgument("PersonRepository")
             ->withArgument("ApiKeyRepository")
             ->withArgument("EventEmitter")
-            ->withArgument("ValidatorService");
+            ->withArgument("ValidatorService")
+            ->withArgument("JwtService");
 
         $this->app->registerCommandHandler("Avent\\CommandBus\\Handler\\UserAuthenticationHandler");
     }
@@ -72,7 +77,7 @@ class UserAuthenticationServiceTest extends \PHPUnit_Framework_TestCase
 
         $array_response = json_decode($response->getContent());
 
-        $this->assertSame("12345678", $array_response->data->api_key);
+        $this->assertObjectHasAttribute("token", $array_response->data);
     }
 }
 

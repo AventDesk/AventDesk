@@ -7,6 +7,8 @@ class SecurityEventTest extends \PHPUnit_Framework_TestCase
      */
     private $app;
 
+    private $token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwZXJzb25faWQiOjEsImFwaV9rZXkiOiIxMjM0NTY3OCIsImxldmVsIjo0fQ.N7mJkc1o2reHEUf-pPLCjzwOBsE2P7uirmF5VXpPGek";
+
     public function setUp()
     {
         $this->app = \Avent\Core\Application::getInstance();
@@ -17,7 +19,7 @@ class SecurityEventTest extends \PHPUnit_Framework_TestCase
                 "findOneBy" => function() {
                     $key = new \Avent\Entity\ApiKey();
                     $key->setApiKey("123");
-                    $key->setLevel(9);
+                    $key->setLevel(4);
                     return $key;
                 }
             ]
@@ -33,6 +35,9 @@ class SecurityEventTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->app->getContainer()->singleton("ApiKeyRepository", $repository_mock);
+        $this->app->getContainer()->singleton("JwtService", function () {
+            return new \Avent\Services\Application\JwtService("secret");
+        });
         $this->app->getContainer()->singleton("Logger", function () {
             return new \Monolog\Logger("test");
         });
@@ -41,7 +46,8 @@ class SecurityEventTest extends \PHPUnit_Framework_TestCase
             "\\Avent\\Events\\SecurityHook",
             [
                 "Logger",
-                "ApiKeyRepository"
+                "ApiKeyRepository",
+                "JwtService"
             ]
         );
 
@@ -56,16 +62,14 @@ class SecurityEventTest extends \PHPUnit_Framework_TestCase
     public function testSecurityEvent()
     {
         $data = [
-            "api_key" => 123,
+            "token" => $this->token,
             "request_uri" => "/hello-world",
             "method" => "GET",
         ];
 
-        $event = $this->app->getEventEmitter()->emit("before.dispatch", $data, (array) $this->app->routes);
+        $event = $this->app->getEventEmitter()->emit("security.event", $data, (array) $this->app->routes);
 
-        if ($event->isPropagationStopped()) {
-            $this->fail();
-        }
+        $this->assertTrue($event->isPropagationStopped());
     }
 }
 
