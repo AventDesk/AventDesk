@@ -4,7 +4,6 @@
 namespace Avent\Core\Event;
 
 use Avent\Core\Event\Exception\InvalidEventNameException;
-use Codeception\Util\Debug;
 use League\Container\ContainerAwareInterface;
 use League\Container\ContainerAwareTrait;
 use League\Event\CallbackListener;
